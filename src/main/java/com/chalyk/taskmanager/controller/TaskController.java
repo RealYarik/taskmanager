@@ -5,6 +5,7 @@ import com.chalyk.taskmanager.facade.SolutionFacade;
 import com.chalyk.taskmanager.facade.TaskFacade;
 import com.chalyk.taskmanager.model.Account;
 import com.chalyk.taskmanager.model.Task;
+import com.chalyk.taskmanager.payload.response.MessageResponse;
 import com.chalyk.taskmanager.service.AccountService;
 import com.chalyk.taskmanager.service.SolutionService;
 import com.chalyk.taskmanager.service.TaskService;
@@ -12,8 +13,12 @@ import com.chalyk.taskmanager.util.ResponseErrorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ObjectUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +32,15 @@ public class TaskController {
     private final SolutionService solutionService;
     private final TaskFacade taskFacade;
     private final AccountService accountService;
+    private final ResponseErrorValidation responseErrorValidation;
 
     @Autowired
-    public TaskController(TaskService taskService, SolutionService solutionService, ResponseErrorValidation responseErrorValidation, TaskFacade taskFacade, SolutionFacade solutionFacade, AccountService accountService) {
+    public TaskController(TaskService taskService, SolutionService solutionService, ResponseErrorValidation responseErrorValidation, TaskFacade taskFacade, SolutionFacade solutionFacade, AccountService accountService, ResponseErrorValidation responseErrorValidation1) {
         this.taskService = taskService;
         this.solutionService = solutionService;
         this.taskFacade = taskFacade;
         this.accountService = accountService;
+        this.responseErrorValidation = responseErrorValidation1;
     }
 
     @GetMapping
@@ -48,12 +55,30 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> getTaskBySpecificAccountId(@PathVariable Long id) {
+    public ResponseEntity<Object> getTaskByIdForCurrentAccount(Principal principal, @PathVariable Long id) {
         Task task = taskService.findTaskById(id);
+        if (task.getAuthor().getLogin().equals(principal.getName()) ||
+                task.getExecutor().getLogin().equals(principal.getName())) {
+            TaskDto taskDto = taskFacade.taskToTaskDto(task);
+            taskDto.setSolutionNumber(solutionService.getSizeSolutionsByTaskId(task.getId()));
 
-        TaskDto taskDto = taskFacade.taskToTaskDto(task);
-        taskDto.setSolutionNumber(solutionService.getSizeSolutionsByTaskId(task.getId()));
+            return new ResponseEntity<>(taskDto, HttpStatus.OK);
+        }
 
-        return new ResponseEntity<>(taskDto, HttpStatus.OK);
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','MENTOR')")
+    public ResponseEntity<Object> createTask(Principal principal, @Valid @RequestBody TaskDto taskDto, BindingResult bindingResult) {
+        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
+
+        if (!ObjectUtils.isEmpty(errors)) {
+            return errors;
+        }
+        taskDto.setAuthor(principal.getName());
+        taskService.createTask(taskDto);
+
+        return ResponseEntity.ok(new MessageResponse("Task added successfully"));
     }
 }

@@ -14,6 +14,7 @@ public class AccountFacade {
         accountDto.setLastName(account.getLastName());
         accountDto.setLogin(account.getLogin());
         accountDto.setGender(account.getGender());
+        accountDto.setRoles(account.getRoles());
 
         return accountDto;
     }

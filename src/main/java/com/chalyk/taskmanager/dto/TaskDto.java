@@ -1,7 +1,10 @@
 package com.chalyk.taskmanager.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 public class TaskDto {
 
@@ -22,6 +25,9 @@ public class TaskDto {
     private Boolean isClosed;
 
     private Integer solutionNumber;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createDate;
 
     public Long getId() {
         return id;
@@ -79,4 +85,11 @@ public class TaskDto {
         this.solutionNumber = solutionNumber;
     }
 
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
 }

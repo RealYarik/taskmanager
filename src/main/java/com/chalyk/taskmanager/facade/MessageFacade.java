@@ -13,7 +13,9 @@ public class MessageFacade {
         messageDto.setText(message.getText());
         messageDto.setOwner(message.getOwner().getLogin());
         messageDto.setReceiver(message.getReceiver().getLogin());
+        messageDto.setSendDate(message.getSendDate());
 
         return messageDto;
     }
+
 }

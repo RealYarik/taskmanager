@@ -14,6 +14,7 @@ public class SolutionFacade {
         solutionDto.setCode(solution.getCode());
         solutionDto.setSolved(solution.getSolved());
         solutionDto.setTaskId(solution.getTaskAndSolution().getId());
+        solutionDto.setCreateDate(solution.getCreateDate());
 
         return solutionDto;
     }

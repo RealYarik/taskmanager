@@ -1,5 +1,7 @@
 package com.chalyk.taskmanager.service;
 
+import com.chalyk.taskmanager.dto.TaskDto;
+import com.chalyk.taskmanager.facade.TaskFacade;
 import com.chalyk.taskmanager.model.Account;
 import com.chalyk.taskmanager.model.Role;
 import com.chalyk.taskmanager.model.Task;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Transactional
@@ -15,17 +18,27 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final AccountService accountService;
+    private final TaskFacade taskFacade;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, AccountService accountService, TaskFacade taskFacade) {
         this.taskRepository = taskRepository;
+        this.accountService = accountService;
+        this.taskFacade = taskFacade;
     }
 
     public Task findTaskById(Long id) {
         return taskRepository.findTaskById(id);
     }
 
-    public void createTask(Task task) {
+    public void createTask(TaskDto taskDto) {
+        Task task = taskFacade.taskDtoToTask(taskDto);
+        task.setAuthor(accountService.findAccountByLogin(taskDto.getAuthor()));
+        task.setExecutor(accountService.findAccountByLogin(taskDto.getExecutor()));
+        task.setCreateDate(LocalDateTime.now());
+        task.setClosed(false);
+
         taskRepository.save(task);
     }
 

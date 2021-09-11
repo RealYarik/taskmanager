@@ -15,7 +15,18 @@ public class TaskFacade {
         taskDto.setAuthor(task.getAuthor().getLogin());
         taskDto.setExecutor(task.getExecutor().getLogin());
         taskDto.setClosed(task.getClosed());
+        taskDto.setCreateDate(task.getCreateDate());
 
         return taskDto;
+    }
+
+    public Task taskDtoToTask(TaskDto taskDto) {
+        Task task = new Task();
+        task.setName(taskDto.getName());
+        task.setDescription(taskDto.getDescription());
+        task.setClosed(taskDto.getClosed());
+        task.setCreateDate(taskDto.getCreateDate());
+
+        return task;
     }
 }

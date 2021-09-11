@@ -1,9 +1,11 @@
 package com.chalyk.taskmanager.dto;
 
 import com.chalyk.taskmanager.model.Gender;
+import com.chalyk.taskmanager.model.Role;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 public class AccountDto {
 
@@ -22,6 +24,8 @@ public class AccountDto {
 
     @NotEmpty(message = "Login cannot be empty")
     private String login;
+
+    private Set<Role> roles;
 
     public Long getId() {
         return id;
@@ -61,5 +65,13 @@ public class AccountDto {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

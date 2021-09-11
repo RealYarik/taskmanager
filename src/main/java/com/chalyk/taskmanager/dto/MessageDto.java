@@ -1,7 +1,10 @@
 package com.chalyk.taskmanager.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 public class MessageDto {
 
@@ -14,6 +17,9 @@ public class MessageDto {
     private String owner;
 
     private String receiver;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime sendDate;
 
     public Long getId() {
         return id;
@@ -45,5 +51,13 @@ public class MessageDto {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
+    }
+
+    public LocalDateTime getSendDate() {
+        return sendDate;
+    }
+
+    public void setSendDate(LocalDateTime sendDate) {
+        this.sendDate = sendDate;
     }
 }

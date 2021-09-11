@@ -36,12 +36,10 @@ public class AccountService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return accountRepository.findAccountByLogin(s);
+        return accountRepository.findAccountByLogin(s).orElse(new Account());
     }
 
-    public void updateAccount(Account account, String firstName, String lastName) {
-        account.setFirstName(firstName);
-        account.setLastName(lastName);
+    public void updateAccount(Account account) {
         accountRepository.save(account);
     }
 
@@ -73,7 +71,7 @@ public class AccountService implements UserDetailsService {
 
     public Account getAccountByPrincipal(Principal principal) {
         String login = principal.getName();
-        return accountRepository.findAccountByLogin(login);
+        return accountRepository.findAccountByLogin(login).orElse(new Account());
     }
 
     public List<Account> findAll() {
@@ -81,10 +79,14 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account findAccountByLogin(String login) {
-        return accountRepository.findAccountByLogin(login);
+        return accountRepository.findAccountByLogin(login).orElse(new Account());
     }
 
     public Account findAccountById(Long id) {
         return accountRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Not found User By Id"));
+    }
+
+    public List<String> findAccountLoginsWithoutPrincipal(String login) {
+        return accountRepository.findAccountLoginsWithoutPrincipal(login);
     }
 }
